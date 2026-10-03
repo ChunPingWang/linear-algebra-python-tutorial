@@ -71,6 +71,9 @@ def check(label: str, got, expected=None, tol: float = 1e-9) -> bool:
     if expected is None:
         ok = bool(got)
         detail = ""
+    elif isinstance(got, str) or isinstance(expected, str):
+        ok = got == expected                      # 字串用直接比較
+        detail = "" if ok else f"  (got {got!r}, expected {expected!r})"
     else:
         ok = allclose(got, expected, tol)
         if not ok:

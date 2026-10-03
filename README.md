@@ -8,7 +8,20 @@
 * **對應的 Jupyter Notebook**（`notebooks/chNN_*.ipynb`，由同一份原始碼自動產生）
 * **從零實作的演算法套件**（`linalg_tutorial/`），並與 NumPy / SciPy 互相驗證
 
-教材中的每一個數學敘述都附帶 `✓` 的程式驗算，執行章節就會看到驗證結果。
+教材中的每一個數學敘述都附帶 `✓` 的程式驗算 ──
+目前 24 章共 **1,865 項驗算全部通過**，執行任一章就會看到結果：
+
+```
+============================================================
+4.3 最小平方配直線：三種方法同一答案
+============================================================
+正規方程      x̂ = [ 5. -3.]
+微積分（偏微分）x̂ = [ 5. -3.]
+numpy lstsq   x̂ = [ 5. -3.]
+  ✓ 三種方法一致
+  ✓ 與 numpy 一致
+...
+```
 
 ---
 
@@ -28,6 +41,19 @@ python3 -m venv .venv
 
 # 4. 用 Jupyter 開啟
 .venv/bin/jupyter lab notebooks/
+
+# 5. 測試
+.venv/bin/python -m pytest tests/ -q              # 套件的單元測試（< 1 秒）
+.venv/bin/python -m pytest tests/ -q --runslow    # 連同跑完 24 章（約 40 秒）
+```
+
+也可以用 `make`：
+
+```bash
+make setup       # 建立環境
+make notebooks   # 產生 notebooks
+make run         # 依序執行全部章節並統計驗算結果
+make test-all    # 單元測試 + 整章整合測試
 ```
 
 ## 專案結構
@@ -46,6 +72,7 @@ linear-algebra-python-tutorial/
 │   ├── svd_tools.py    SVD、低秩近似、PCA、條件數
 │   └── viz.py          繪圖輔助（腳本存檔／notebook 直接顯示）
 ├── tools/              notebook 產生器
+├── tests/              單元測試（套件）＋ 整合測試（跑完每一章）
 ├── docs/               課程地圖、原書章節對照表
 ├── figures/            執行後產生的圖（不納入版本控制）
 └── requirements.txt
@@ -81,9 +108,12 @@ linear-algebra-python-tutorial/
 | 18 | 線性 ODE 的線性代數結構 | Riley 14, 15, 16 |
 | 19 | 數值線性代數：迭代法、Krylov 與求積 | Riley 27 |
 | 20 | 偏微分方程的離散化與 Kronecker 積 | Riley 20, 21 |
+| 21 | 量子算子：Hermitian 矩陣、交換子與不確定性 | Riley 19 |
+| 22 | 變分法、積分方程與有限元素法 | Riley 22, 23, 24, 25 |
+| 23 | 群表示論：對稱性造成的分塊對角化 | Riley 28, 29 |
+| 24 | 機率與統計中的線性代數 | Riley 30, 31 |
 
-> 後續章節（從資料學習、Strang 附錄精選、以及 Riley 各章的線性代數視角補充）
-> 持續增補中，詳見 [`docs/00-課程地圖.md`](docs/00-課程地圖.md)。
+兩本原書每一章的覆蓋狀況，詳見 [`docs/00-課程地圖.md`](docs/00-課程地圖.md)。
 
 ## 關於參考書
 

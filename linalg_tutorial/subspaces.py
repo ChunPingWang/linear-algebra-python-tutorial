@@ -11,6 +11,7 @@ __all__ = [
     "rref",
     "pivot_columns",
     "rank",
+    "rank_svd",
     "cr_factor",
     "nullspace",
     "column_space",
@@ -34,13 +35,16 @@ def rref(A, tol: float = TOL) -> tuple[np.ndarray, list[int]]:
     """
     R = np.array(A, dtype=float, copy=True)
     m, n = R.shape
+    # 主元門檻必須隨矩陣的尺度調整：絕對門檻對元素很小（或很大）的矩陣會誤判
+    scale = float(np.max(np.abs(R))) if R.size else 0.0
+    thresh = tol * max(m, n) * max(scale, 1.0)
     pivots: list[int] = []
     row = 0
     for col in range(n):
         if row >= m:
             break
         p = row + int(np.argmax(np.abs(R[row:, col])))
-        if abs(R[p, col]) <= tol:
+        if abs(R[p, col]) <= thresh:
             R[row:, col] = 0.0          # 整欄（在剩下的列中）都是 0 → 自由欄
             continue
         if p != row:
@@ -51,7 +55,7 @@ def rref(A, tol: float = TOL) -> tuple[np.ndarray, list[int]]:
                 R[i, :] -= R[i, col] * R[row, :]
         pivots.append(col)
         row += 1
-    R[np.abs(R) <= tol] = 0.0
+    R[np.abs(R) <= thresh] = 0.0
     return R, pivots
 
 
@@ -61,8 +65,26 @@ def pivot_columns(A, tol: float = TOL) -> list[int]:
 
 
 def rank(A, tol: float = TOL) -> int:
-    """秩 r = 獨立欄數 = 獨立列數。"""
+    """秩 r = 獨立欄數 = 獨立列數（用消去法/rref 計算）。
+
+    注意：消去法**不是**可靠的數值秩判定器。對接近退化的矩陣，
+    消去過程的捨入誤差會讓「幾乎為零」的主元看起來不為零。
+    數值上要判斷秩，請用 :func:`rank_svd`（看奇異值的大小）。
+    這正是 Strang 第 7 章強調「奇異值優於主元」的理由。
+    """
     return len(pivot_columns(A, tol))
+
+
+def rank_svd(A, tol: float | None = None) -> int:
+    """用奇異值判斷秩（數值上可靠的做法）。
+
+    預設門檻是 ``max(m, n) * σ_max * eps``，與 ``numpy.linalg.matrix_rank`` 相同。
+    """
+    A = np.asarray(A, dtype=float)
+    s = np.linalg.svd(A, compute_uv=False)
+    if tol is None:
+        tol = max(A.shape) * (s[0] if s.size else 0.0) * np.finfo(float).eps
+    return int(np.sum(s > tol))
 
 
 def cr_factor(A, tol: float = TOL) -> tuple[np.ndarray, np.ndarray]:

@@ -119,6 +119,10 @@ def qr_algorithm(A, iters: int = 500, tol: float = 1e-12):
 
     每一步 A_k = Q_k R_k 是相似變換 A_{k+1} = Q_k^T A_k Q_k，特徵值不變。
     回傳 (特徵值陣列, 累積的 Q)。
+
+    這是「教學版」：沒有加位移（shift）也沒有先化成三對角形，
+    所以收斂速度只是線性的（比值 |λ_{i+1}/λ_i|），而且絕對值相近的
+    特徵值會收斂得很慢。LAPACK 用的是加位移的隱式 QR（見第 13 章）。
     """
     A_k = np.array(A, dtype=float, copy=True)
     n = A_k.shape[0]
@@ -133,13 +137,18 @@ def qr_algorithm(A, iters: int = 500, tol: float = 1e-12):
     return np.diag(A_k).copy(), Q_total
 
 
-def jacobi_eigen(A, iters: int = 100, tol: float = 1e-12):
+def jacobi_eigen(A, iters: int | None = None, tol: float = 1e-12):
     """對稱矩陣的 Jacobi 旋轉法：用一連串 2x2 旋轉把非對角元素消成 0。
 
     回傳 (特徵值, 特徵向量矩陣 V)，且 A = V diag(λ) V^T。
+
+    每次旋轉只消掉一個非對角元素（但會讓別的位置復活），所需的旋轉次數
+    大致與非對角元素個數 n(n−1)/2 成正比，所以預設迭代次數隨 n 成長。
     """
     A_k = np.array(A, dtype=float, copy=True)
     n = A_k.shape[0]
+    if iters is None:
+        iters = max(100, 10 * n * (n - 1))
     if not np.allclose(A_k, A_k.T):
         raise ValueError("Jacobi 法只適用於對稱矩陣")
     V = np.eye(n)
@@ -177,8 +186,9 @@ def is_positive_definite(A, tol: float = 1e-12) -> bool:
 
 
 def diagonalize(A):
-    """A = X Λ X^{-1}；若特徵向量不足（不可對角化）則回傳 None。"""
-    A = np.asarray(A, dtype=float)
+    """A = X Λ X^{-1}；若特徵向量不足（不可對角化）則回傳 None。支援複數矩陣。"""
+    A = np.asarray(A)
+    A = A.astype(complex if np.iscomplexobj(A) else float)
     lam, X = np.linalg.eig(A)
     if np.linalg.matrix_rank(X, tol=1e-8) < A.shape[0]:
         return None
@@ -197,9 +207,10 @@ def matrix_power_by_eigen(A, k: int):
     """A^k = X Λ^k X^{-1}：特徵值取 k 次方即可。"""
     out = diagonalize(A)
     if out is None:
-        return np.linalg.matrix_power(np.asarray(A, dtype=float), k)
+        return np.linalg.matrix_power(np.asarray(A), k)
     lam, X, Xinv = out
-    return np.real_if_close(X @ np.diag(lam ** k) @ Xinv)
+    result = X @ np.diag(lam ** k) @ Xinv
+    return np.real_if_close(result) if not np.iscomplexobj(np.asarray(A)) else result
 
 
 def matrix_exp_by_eigen(A, t: float = 1.0):
@@ -208,14 +219,19 @@ def matrix_exp_by_eigen(A, t: float = 1.0):
     if out is None:
         return matrix_exp_series(A, t)
     lam, X, Xinv = out
-    return np.real_if_close(X @ np.diag(np.exp(lam * t)) @ Xinv)
+    result = X @ np.diag(np.exp(lam * t)) @ Xinv
+    # 原矩陣是實數時，把浮點殘留的虛部清掉；複數矩陣則保留
+    return np.real_if_close(result) if not np.iscomplexobj(np.asarray(A)) else result
 
 
 def matrix_exp_series(A, t: float = 1.0, terms: int = 60):
-    """用冪級數 e^{At} = Σ (At)^k / k! 計算（不需要可對角化）。"""
-    A = np.asarray(A, dtype=float) * t
+    """用冪級數 e^{At} = Σ (At)^k / k! 計算（不需要可對角化，也支援複數矩陣）。"""
+    A = np.asarray(A)
+    dtype = complex if np.iscomplexobj(A) or np.iscomplexobj(t) else float
+    A = A.astype(dtype) * t
     n = A.shape[0]
-    S, term = np.eye(n), np.eye(n)
+    S = np.eye(n, dtype=dtype)
+    term = np.eye(n, dtype=dtype)
     for k in range(1, terms):
         term = term @ A / k
         S = S + term

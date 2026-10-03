@@ -45,7 +45,9 @@ def svd_from_eigen(A, tol: float = 1e-12):
     if k < U.shape[1]:                        # 補滿左側正交基底
         Q, _ = np.linalg.qr(np.hstack([U[:, :k], np.eye(m)]))
         U[:, k:] = Q[:, k:U.shape[1]]
-    return U, s[:min(m, n)], V.T
+    r = min(m, n)
+    # 回傳精簡型：U 是 m×r、s 有 r 個、Vt 是 r×n（m < n 時也正確）
+    return U, s[:r], V[:, :r].T
 
 
 def svd_pieces(A):
