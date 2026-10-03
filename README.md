@@ -77,6 +77,10 @@ linear-algebra-python-tutorial/
 | 14 | 物理視角：內積空間、矩陣函數與二次式 | Riley 8 |
 | 15 | 法模態：廣義特徵值問題 $K\mathbf x=\omega^2M\mathbf x$ | Riley 9 |
 | 16 | 向量代數、叉積與張量 | Riley 7, 26 |
+| 17 | 無窮維線性代數：Fourier、正交函數與 Sturm–Liouville | Riley 12, 17, 18 |
+| 18 | 線性 ODE 的線性代數結構 | Riley 14, 15, 16 |
+| 19 | 數值線性代數：迭代法、Krylov 與求積 | Riley 27 |
+| 20 | 偏微分方程的離散化與 Kronecker 積 | Riley 20, 21 |
 
 > 後續章節（從資料學習、Strang 附錄精選、以及 Riley 各章的線性代數視角補充）
 > 持續增補中，詳見 [`docs/00-課程地圖.md`](docs/00-課程地圖.md)。

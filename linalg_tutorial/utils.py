@@ -49,11 +49,15 @@ def round_clean(A, decimals: int = 10):
 
 
 def allclose(a, b, tol: float = 1e-9) -> bool:
-    """容忍浮點誤差的相等判斷（可處理形狀相同的實數/複數陣列）。"""
+    """容忍浮點誤差的相等判斷（可處理形狀相同的實數/複數陣列）。
+
+    相對與絕對容差都用同一個 ``tol``：寬鬆的相對容差會讓驗算形同虛設，
+    所以這裡刻意不放大 rtol。數值誤差較大的比較請在呼叫時明確指定 ``tol``。
+    """
     a, b = np.asarray(a), np.asarray(b)
     if a.shape != b.shape:
         return False
-    return bool(np.allclose(a, b, rtol=tol * 1e3, atol=tol))
+    return bool(np.allclose(a, b, rtol=tol, atol=tol))
 
 
 def check(label: str, got, expected=None, tol: float = 1e-9) -> bool:

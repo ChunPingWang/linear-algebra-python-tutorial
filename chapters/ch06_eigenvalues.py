@@ -228,7 +228,7 @@ out = diagonalize(A)
 lam, X, Xinv = out
 show_matrix("A（三角，λ 在對角線）", A)
 show_matrix("X（特徵向量）", X)
-print(f"Λ = diag{tuple(np.round(np.real(lam), 4))}")
+print(f"Λ = diag({', '.join(f'{v:.4g}' for v in np.real(lam))})")
 check("AX = XΛ", A @ X, X @ np.diag(lam))
 check("X⁻¹AX = Λ", Xinv @ A @ X, np.diag(lam), tol=1e-8)
 check("A = XΛX⁻¹", X @ np.diag(lam) @ Xinv, A, tol=1e-8)

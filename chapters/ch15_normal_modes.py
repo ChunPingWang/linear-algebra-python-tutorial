@@ -416,9 +416,10 @@ for eps in [0.1, 0.03, 0.01, 0.003]:
     x = v1 + eps * v2
     err = rayleigh(x) - omega2_r[0]
     print(f"{eps:>10} | {err:>14.3e} | {err / eps ** 2:>12.6f}")
-check("頻率誤差 ∝ ε²（而非 ε）",
-      (rayleigh(v1 + 0.01 * v2) - omega2_r[0]) / 0.01 ** 2,
-      (rayleigh(v1 + 0.003 * v2) - omega2_r[0]) / 0.003 ** 2, tol=1e-6)
+r_a = (rayleigh(v1 + 0.01 * v2) - omega2_r[0]) / 0.01 ** 2
+r_b = (rayleigh(v1 + 0.003 * v2) - omega2_r[0]) / 0.003 ** 2
+check("頻率誤差 ∝ ε²（而非 ε）：誤差/ε² 收斂到同一個常數",
+      abs(r_a - r_b) / abs(r_b) < 1e-3)
 print("  ⇒ 試驗向量差 10%，頻率只差 1% —— Rayleigh–Ritz 便宜又準")
 
 # Ritz 法：在小子空間裡解廣義特徵值問題
