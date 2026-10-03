@@ -72,6 +72,11 @@ linear-algebra-python-tutorial/
 | 9 | SVD、影像壓縮與 PCA | Strang 7；Riley 8.18, 31.2 |
 | 10 | 線性轉換、基底變換與 Jordan 形式 | Strang 8、附錄 5；Riley 8.2, 8.15, 26.2 |
 | 11 | 最佳化中的線性代數 | Strang 9；Riley 5.8–5.9 |
+| 12 | 從資料學習：分段線性函數與共變異數矩陣 | Strang 10；Riley 30–31 |
+| 13 | 附錄精選：秩、分解目錄、張量、條件數、Markov、圖學 | Strang 附錄 1–10 |
+| 14 | 物理視角：內積空間、矩陣函數與二次式 | Riley 8 |
+| 15 | 法模態：廣義特徵值問題 $K\mathbf x=\omega^2M\mathbf x$ | Riley 9 |
+| 16 | 向量代數、叉積與張量 | Riley 7, 26 |
 
 > 後續章節（從資料學習、Strang 附錄精選、以及 Riley 各章的線性代數視角補充）
 > 持續增補中，詳見 [`docs/00-課程地圖.md`](docs/00-課程地圖.md)。
