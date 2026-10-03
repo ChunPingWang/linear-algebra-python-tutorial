@@ -1,0 +1,20 @@
+# ---- 參考書 PDF：版權素材，不納入版本控制 ----
+Mathematical Methods for Physics and Engineering.pdf
+introduction-to-linear-algebra-6nbsped-1733146679-9781733146678.pdf
+*.pdf
+
+# ---- Python ----
+__pycache__/
+*.py[cod]
+*.egg-info/
+.venv/
+venv/
+.ipynb_checkpoints/
+.pytest_cache/
+.mypy_cache/
+
+# ---- 執行產出 ----
+figures/*.png
+figures/*.svg
+data/*.npz
+.DS_Store
